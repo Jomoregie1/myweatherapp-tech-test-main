@@ -1,40 +1,43 @@
-# MyWeather App Tech Test
+# MyWeatherApp
 
-Welcome to the MyWeather App Tech Test.
+## Overview
 
-## The Challenge
+MyWeatherApp is a simple Spring Boot application that allows users to compare the weather conditions between two different cities. This application uses a third-party weather service to retrieve weather data and performs analysis on two major aspects:
 
-You are tasked with implementing two new features in the app:
+1. **Daylight Hours Comparison:** Compares the daylight hours of two cities based on the sunrise and sunset times.
 
-1. **Daylight Hours Comparison:** Given two city names, compare the length of the daylight hours between them and return the city with the longest day. In this context, "daylight hours" means the time between sunrise and sunset.
-
-2. **Rain Check:** Given two city names, check which city it is currently raining in.
-
-In addition to implementing these 2 features, you will also need to write tests verifying that your code works as expected.
-
-If possible, include exception handling in the controller.
-
-Finally, you can write any documentation as you see fit, explaining your choices and how the code works.
-
-## The Codebase
-
-The codebase is a Java application built with the Spring framework. It includes a `WeatherController` class where you will add your new features.
+2. **Rain Check:** Checks if it's raining in either of the cities.
 
 ## Implementation Details
 
-You will need to implement these features by adding new endpoints to the `WeatherController`.
+### Daylight Hours
 
-### Prerequisites
+The endpoint for comparing daylight hours is GET /daylight. This method takes two request parameters, city1 and city2, which are the names of the cities to compare. The application calls the weather service to retrieve the sunrise and sunset times for each city, calculates the number of daylight hours, and compares the results. The result is returned in the response.
 
-- [Java sdk 17](https://openjdk.java.net/projects/jdk/17/)
-- [Maven 3.6.3+](https://maven.apache.org/install.html)
-- API key for [Visual Crossing Weather API](https://www.visualcrossing.com/weather-data-editions). 
-  - This can be done by creating a free account on the above link. Then you will need to add your key to the `weather.visualcrossing.key` field in src/main/resources/application.properties
+```java
+@GetMapping("/daylight")
+public ResponseEntity<String> compareDaylightHours(@RequestParam String city1, @RequestParam String city2)
+}
+```
 
-## Submission
+### Rain Check
 
-* Push the downloaded version of this repo to your Github
-* Make a branch for your changes
-* Once you're ready to submit, raise a Pull Request to merge your changes with your main branch and share the repo with us.
+The endpoint for checking rain is GET /raincheck. This method also takes city1 and city2 as request parameters. The application checks the current weather conditions for each city from the weather service and checks if it's raining. The result is returned in the response.
 
-Good luck!
+```java
+@GetMapping("/raincheck")
+public ResponseEntity<String> checkRain(@RequestParam String city1, @RequestParam String city2)
+
+```
+
+### Error Handling
+
+In both cases, if an error occurs during the execution (e.g. the city name is wrong, or the weather service fails), the controller will catch the exception and return a 500 HTTP status code, along with a message indicating the error.
+
+### Testing
+
+Unit tests are implemented using JUnit 5 and Mockito to ensure that the implemented features work as expected.
+The tests simulate different weather conditions by mocking the WeatherService's forecastByCity() method to return custom CityInfo objects.
+For example, the compareDaylightHours() test case checks that the GET /daylight endpoint returns a successful status code and verifies the daylight comparison result.
+The checkRain() test case checks the GET /raincheck endpoint and verifies whether it correctly identifies if it's raining in the cities.
+Additional test cases simulate scenarios where both cities are experiencing rain and where the weather service fails to respond.
